@@ -28,14 +28,28 @@ public class SecurityFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         var token = this.recoverToken(request);
-        var login = tokenService.validateToken(token);
+        if (token == null) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
-        if (login != null) {
-            User user = userRepository.findByEmail(login).orElseThrow(() -> new RuntimeException("User Not Found"));
+        var userId = tokenService.validateToken(token);
+        if (userId == null) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        try {
+            User user = userRepository.findById((userId))
+                    .orElseThrow(() -> new RuntimeException("Usuário não encontrado."));
             var authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"));
             var authentication = new UsernamePasswordAuthenticationToken(user, null, authorities);
             SecurityContextHolder.getContext().setAuthentication(authentication);
+        } catch (RuntimeException e) {
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Usuário não autorizado");
+            return;
         }
+
         filterChain.doFilter(request, response);
     }
 
