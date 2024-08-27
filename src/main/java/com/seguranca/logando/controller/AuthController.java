@@ -30,16 +30,6 @@ public class AuthController {
     @Autowired
     private TokenService tokenService;
 
-    @PostMapping("/login")
-    public ResponseEntity<ResponseDto> login(@RequestBody LoginRequestDto body) {
-        User user = this.repository.findByEmail(body.email()).orElseThrow(() -> new RuntimeException("User not found"));
-        if (passwordEncoder.matches(body.password(), user.getPassword())) {
-            String token = this.tokenService.generateToken(user);
-            return ResponseEntity.ok(new ResponseDto(user.getName(), token));
-        }
-        return ResponseEntity.badRequest().build();
-    }
-
     @PostMapping("/register")
     public ResponseEntity<ResponseDto> register(@RequestBody RegisterRequestDto body) {
         Optional<User> user = this.repository.findByEmail(body.email());
@@ -56,4 +46,16 @@ public class AuthController {
         }
         return ResponseEntity.badRequest().build();
     }
+
+
+    @PostMapping("/login")
+    public ResponseEntity<ResponseDto> login(@RequestBody LoginRequestDto body) {
+        User user = this.repository.findByEmail(body.email()).orElseThrow(() -> new RuntimeException("User not found"));
+        if (passwordEncoder.matches(body.password(), user.getPassword())) {
+            String token = this.tokenService.generateToken(user);
+            return ResponseEntity.ok(new ResponseDto(user.getName(), token));
+        }
+        return ResponseEntity.badRequest().build();
+    }
+
 }

@@ -41,12 +41,12 @@ public class SecurityFilter extends OncePerRequestFilter {
 
         try {
             User user = userRepository.findById((userId))
-                    .orElseThrow(() -> new RuntimeException("Usuário não encontrado."));
+                    .orElseThrow(() -> new RuntimeException("User not found."));
             var authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"));
             var authentication = new UsernamePasswordAuthenticationToken(user, null, authorities);
             SecurityContextHolder.getContext().setAuthentication(authentication);
         } catch (RuntimeException e) {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Usuário não autorizado");
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized user");
             return;
         }
 
