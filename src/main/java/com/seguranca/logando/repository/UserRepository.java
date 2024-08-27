@@ -9,5 +9,6 @@ import com.seguranca.logando.model.User;
 
 public interface UserRepository extends JpaRepository<User, UUID> {
     Optional<User> findByEmail(String email);
-    Optional<User> findById(String UUID);
+
+    Optional<User> findById(UUID id);
 }

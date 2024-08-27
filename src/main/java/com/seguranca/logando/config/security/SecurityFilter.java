@@ -16,6 +16,7 @@ import com.seguranca.logando.repository.UserRepository;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.UUID;
 
 @Component
 public class SecurityFilter extends OncePerRequestFilter {
@@ -40,7 +41,7 @@ public class SecurityFilter extends OncePerRequestFilter {
         }
 
         try {
-            User user = userRepository.findById((userId))
+            User user = userRepository.findById(UUID.fromString(userId))
                     .orElseThrow(() -> new RuntimeException("User not found."));
             var authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"));
             var authentication = new UsernamePasswordAuthenticationToken(user, null, authorities);
